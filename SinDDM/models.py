@@ -15,7 +15,7 @@ from matplotlib import pyplot as plt
 from tqdm import tqdm
 
 
-class EMA():
+class EMA():#exponential moving average
     def __init__(self, beta):
         super().__init__()
         self.beta = beta
@@ -31,7 +31,7 @@ class EMA():
         return old * self.beta + (1 - self.beta) * new
 
 
-class SinusoidalPosEmb(nn.Module):
+class SinusoidalPosEmb(nn.Module):# use sinusoidal position embedding to encode time step
     def __init__(self, dim):
         super().__init__()
         self.dim = dim
@@ -296,7 +296,7 @@ class MultiScaleGaussianDiffusion(nn.Module):
             target_patch_resize = F.interpolate(self.roi_target_patch[scale], size=(bb_h, bb_w))
             x_modified[:, :, bb_y:bb_y + bb_h, bb_x:bb_x + bb_w] = eta * target_patch_resize + (1-eta) * x_modified[:, :, bb_y:bb_y + bb_h, bb_x:bb_x + bb_w]
         return x_modified
-
+    # Get the mean and variance of q(x_t | x_0)
     def q_mean_variance(self, x_start, t):
         mean = extract(self.sqrt_alphas_cumprod, t, x_start.shape) * x_start
         variance = extract(1. - self.alphas_cumprod, t, x_start.shape)
@@ -317,7 +317,7 @@ class MultiScaleGaussianDiffusion(nn.Module):
             x_t_mix = x_recon_ddpm # without subtraction of the blurry part
             return x_tm1_mix, x_t_mix
 
-
+# Compute the mean and variance of the diffusion posterior: q(x_{t-1} | x_t, x_0)
     def q_posterior(self, x_start, x_t_mix, x_t, t, s):
         if not self.reblurring or s == 0:
             # regular DDPM
